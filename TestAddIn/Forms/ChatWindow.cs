@@ -67,10 +67,10 @@ namespace InvAddIn.Forms
             // sendButton
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.sendButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.sendButton.BackColor = System.Drawing.Color.White;
             this.sendButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sendButton.ForeColor = System.Drawing.Color.White;
+            this.sendButton.ForeColor = System.Drawing.Color.Black;
             this.sendButton.Location = new System.Drawing.Point(548, 443);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(106, 40);
@@ -82,10 +82,10 @@ namespace InvAddIn.Forms
             // clearButton
             // 
             this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.clearButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(17)))), ((int)(((byte)(35)))));
+            this.clearButton.BackColor = System.Drawing.Color.White;
             this.clearButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clearButton.ForeColor = System.Drawing.Color.White;
+            this.clearButton.ForeColor = System.Drawing.Color.Black;
             this.clearButton.Location = new System.Drawing.Point(548, 494);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(106, 40);

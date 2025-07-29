@@ -114,15 +114,15 @@ namespace InvAddIn.Forms
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string aboutMessage = "AutoBeau - Beautify your drawing with AI Chat\n\n" +
-                                 "Version: 1.0\n" +
-                                 "This add-in helps you create hole tables, arrange dimensions, " +
-                                 "and provides AI assistance for Inventor development.\n\n" +
-                                 "Features:\n" +
-                                 "? Hole Table Generation\n" +
-                                 "? Auto Dimension Arrangement\n" +
-                                 "? AI Chat Assistant\n" +
-                                 "? Centermarks (Coming Soon)\n\n" +
-                                 "For support, please configure your OpenAI API key in Settings.";
+                                  "Version: 1.0\n" +
+                                  "This add-in helps you create hole tables, arrange dimensions, " +
+                                  "and provides AI assistance for your Inventor project.\n\n" +
+                                  "Features:\n" +
+                                  "+ Hole Table Generation\n" +
+                                  "+ Auto Dimension Arrangement\n" +
+                                  "+ AI Chat Assistant\n" +
+                                  "- Centermarks (Coming Soon)\n\n" +
+                                  "For support, please configure your OpenAI API key in Settings.";
 
             MessageBox.Show(aboutMessage, "About Test AddIn", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
