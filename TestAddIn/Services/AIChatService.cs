@@ -15,8 +15,8 @@ namespace InvAddIn.Services
         public AIChatService(string apiKey)
         {
             _openAIClient = new OpenAIClient(apiKey);
-            _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor add-in development. " +
-                          "You can help with CAD operations, hole tables, dimension arrangements, and general Inventor API questions. " +
+            _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor drawing documents. " +
+                          "You can help with CAD operations, hole tables, dimension arrangements, and general Inventor questions. " +
                           "Keep your responses concise and practical.";
         }
 
@@ -30,7 +30,7 @@ namespace InvAddIn.Services
                     new UserChatMessage(userMessage)
                 };
 
-                var chatCompletion = await _openAIClient.GetChatClient("gpt-3.5-turbo").CompleteChatAsync(chatMessages);
+                var chatCompletion = await _openAIClient.GetChatClient("gpt-4o-mini").CompleteChatAsync(chatMessages);
                 
                 return chatCompletion.Value.Content[0].Text;
             }
