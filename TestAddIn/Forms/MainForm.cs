@@ -113,7 +113,7 @@ namespace InvAddIn.Forms
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string aboutMessage = "Test AddIn - Beautify your drawing with AI Chat\n\n" +
+            string aboutMessage = "AutoBeau - Beautify your drawing with AI Chat\n\n" +
                                  "Version: 1.0\n" +
                                  "This add-in helps you create hole tables, arrange dimensions, " +
                                  "and provides AI assistance for Inventor development.\n\n" +
@@ -130,7 +130,7 @@ namespace InvAddIn.Forms
         private void MainForm_Load(object sender, EventArgs e)
         {
             // Initialize form settings if needed
-            this.Text = "Test AddIn - Beautify your drawing with AI Chat";
+            this.Text = "AutoBeau - Beautify your drawing with AI Chat";
             
             // Set default checkbox states if desired
             // checkBox2.Checked = true; // Default to creating hole table

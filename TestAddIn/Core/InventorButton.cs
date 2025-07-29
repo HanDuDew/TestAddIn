@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using InvAddIn.Forms;
 
 namespace InvAddIn.Core
@@ -25,6 +29,10 @@ namespace InvAddIn.Core
                 // Create the button definition
                 global::Inventor.ControlDefinitions controlDefs = m_inventorApplication.CommandManager.ControlDefinitions;
                 
+                // Load icons for the button (now using PNG files)
+                object standardIcon = LoadIcon(16); // 16x16 for standard icon
+                object largeIcon = LoadIcon(32);    // 32x32 for large icon
+                
                 // Check if button already exists
                 try
                 {
@@ -40,8 +48,8 @@ namespace InvAddIn.Core
                         System.Guid.NewGuid().ToString(), // ClientId
                         "Opens the Test Add In Main Form", // ToolTipText
                         "Opens the Test AddIn Main Form for hole table operations", // DescriptionText
-                        null, // StandardIcon
-                        null, // LargeIcon
+                        standardIcon, // StandardIcon (16x16)
+                        largeIcon, // LargeIcon (32x32)
                         global::Inventor.ButtonDisplayEnum.kDisplayTextInLearningMode // ButtonDisplay
                     );
                 }
@@ -54,9 +62,199 @@ namespace InvAddIn.Core
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error initializing button: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error initializing button: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Button Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private object LoadIcon(int size)
+        {
+            try
+            {
+                Bitmap bitmap = null;
+
+                // Try to load PNG favicon files first
+                string iconFileName = $"favicon{size}.png";
+                
+                // Method 1: Try to load from embedded resource first
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string resourceName = $"TestAddIn.Resources.{iconFileName}";
+                
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream != null)
+                    {
+                        bitmap = new Bitmap(stream);
+                        return ConvertBitmapToIPictureDisp(bitmap);
+                    }
+                }
+
+                // Method 2: Try to load from Properties.Resources (existing logo)
+                try
+                {
+                    // Check if we can access the existing logo resource
+                    var resourceManager = InvAddIn.Properties.Resources.ResourceManager;
+                    if (resourceManager != null)
+                    {
+                        // Try to get a specific favicon resource
+                        object faviconResource = resourceManager.GetObject($"favicon{size}");
+                        if (faviconResource is Bitmap faviconBitmap)
+                        {
+                            return ConvertBitmapToIPictureDisp(faviconBitmap);
+                        }
+                        
+                        // Fallback to the existing logo resource and resize it
+                        object logoResource = resourceManager.GetObject("logo");
+                        if (logoResource is Bitmap logoBitmap)
+                        {
+                            // Resize the logo to the desired size
+                            bitmap = new Bitmap(logoBitmap, new Size(size, size));
+                            return ConvertBitmapToIPictureDisp(bitmap);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Could not load from Properties.Resources: {ex.Message}");
+                }
+
+                // Method 3: Try to load from file system
+                string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+                string assemblyDir = Path.GetDirectoryName(assemblyLocation);
+                string iconPath = Path.Combine(assemblyDir, "Resources", iconFileName);
+                
+                if (File.Exists(iconPath))
+                {
+                    bitmap = new Bitmap(iconPath);
+                    return ConvertBitmapToIPictureDisp(bitmap);
+                }
+
+                // Method 4: Try alternative PNG file names
+                string[] alternativeNames = {
+                    $"icon{size}.png",
+                    $"favicon-{size}x{size}.png",
+                    $"icon-{size}x{size}.png"
+                };
+
+                foreach (string altName in alternativeNames)
+                {
+                    string altPath = Path.Combine(assemblyDir, "Resources", altName);
+                    if (File.Exists(altPath))
+                    {
+                        bitmap = new Bitmap(altPath);
+                        return ConvertBitmapToIPictureDisp(bitmap);
+                    }
+                }
+                
+                // If no icons found, return null (button will show without icon)
+                System.Diagnostics.Debug.WriteLine($"No PNG icon found for size {size}x{size}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading PNG icon (size {size}): {ex.Message}");
+                return null;
+            }
+        }
+
+        private object ConvertBitmapToIPictureDisp(Bitmap bitmap)
+        {
+            try
+            {
+                if (bitmap == null) return null;
+
+                // Method 1: Try using AxHost.GetIPictureDispFromPicture via reflection
+                try
+                {
+                    // Access the protected static method via reflection
+                    var method = typeof(AxHost).GetMethod("GetIPictureDispFromPicture", 
+                        BindingFlags.Static | BindingFlags.NonPublic);
+                    if (method != null)
+                    {
+                        return method.Invoke(null, new object[] { bitmap });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"AxHost method failed: {ex.Message}");
+                }
+
+                // Method 2: Use Windows API to convert bitmap to IPictureDisp
+                IntPtr hBitmap = bitmap.GetHbitmap(Color.Transparent);
+                try
+                {
+                    // Create IPictureDisp from HBITMAP using OLE automation
+                    var pictDesc = new PICTDESC.Bitmap
+                    {
+                        cbSizeOfStruct = Marshal.SizeOf<PICTDESC.Bitmap>(),
+                        picType = PICTYPE.PICTYPE_BITMAP,
+                        hbitmap = hBitmap,
+                        hpal = IntPtr.Zero
+                    };
+
+                    // Use IID_IPictureDisp GUID directly
+                    Guid iPictureDispGuid = new Guid("7BF80981-BF32-101A-8BBB-00AA00300CAB");
+                    object picture;
+                    int hr = OleCreatePictureIndirect(ref pictDesc, ref iPictureDispGuid, true, out picture);
+                    
+                    if (hr == 0) // S_OK
+                    {
+                        return picture;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"OleCreatePictureIndirect failed with HRESULT: 0x{hr:X8}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Windows API method failed: {ex.Message}");
+                }
+                finally
+                {
+                    DeleteObject(hBitmap);
+                }
+
+                // Method 3: Fallback - return null to use text-only button
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error converting bitmap to IPictureDisp: {ex.Message}");
+                return null;
+            }
+        }
+
+        #region WIN32 API and COM Interop
+
+        [DllImport("oleaut32.dll")]
+        private static extern int OleCreatePictureIndirect(
+            ref PICTDESC.Bitmap pPictDesc,
+            ref Guid riid,
+            bool fOwn,
+            out object ppvObj);
+
+        [DllImport("gdi32.dll")]
+        private static extern bool DeleteObject(IntPtr hObject);
+
+        private static class PICTYPE
+        {
+            public const short PICTYPE_BITMAP = 1;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PICTDESC
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            public struct Bitmap
+            {
+                public int cbSizeOfStruct;
+                public int picType;
+                public IntPtr hbitmap;
+                public IntPtr hpal;
+            }
+        }
+
+        #endregion
 
         private void AddToRibbon()
         {
@@ -156,7 +354,7 @@ namespace InvAddIn.Core
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding button to ribbon: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error adding button to ribbon: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Ribbon Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -171,7 +369,7 @@ namespace InvAddIn.Core
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error launching main form: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error launching main form: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Form Launch Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -187,7 +385,7 @@ namespace InvAddIn.Core
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error during button cleanup: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"Error during button cleanup: {ex.Message}");
             }
         }
     }

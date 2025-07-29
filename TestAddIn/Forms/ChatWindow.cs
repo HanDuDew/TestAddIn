@@ -49,7 +49,7 @@ namespace InvAddIn.Forms
             this.chatDisplayTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.chatDisplayTextBox.Size = new System.Drawing.Size(644, 403);
             this.chatDisplayTextBox.TabIndex = 0;
-            this.chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about Inventor add-in development!\r\n\r\n";
+            this.chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about your Inventor project!\r\n\r\n";
             this.chatDisplayTextBox.TextChanged += new System.EventHandler(this.chatDisplayTextBox_TextChanged);
             // 
             // chatInputTextBox
@@ -68,6 +68,7 @@ namespace InvAddIn.Forms
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.sendButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.sendButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.sendButton.ForeColor = System.Drawing.Color.White;
             this.sendButton.Location = new System.Drawing.Point(548, 443);
@@ -82,6 +83,7 @@ namespace InvAddIn.Forms
             // 
             this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.clearButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(17)))), ((int)(((byte)(35)))));
+            this.clearButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.clearButton.ForeColor = System.Drawing.Color.White;
             this.clearButton.Location = new System.Drawing.Point(548, 494);
@@ -232,7 +234,7 @@ namespace InvAddIn.Forms
         {
             chatDisplayTextBox.Clear();
             _chatHistory.Clear();
-            chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about Inventor add-in development!\r\n\r\n";
+            chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about your Inventor project!\r\n\r\n";
             statusLabel.Text = "Ready";
             statusLabel.ForeColor = Color.Green;
         }

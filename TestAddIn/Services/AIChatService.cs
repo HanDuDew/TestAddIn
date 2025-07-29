@@ -16,8 +16,9 @@ namespace InvAddIn.Services
         {
             _openAIClient = new OpenAIClient(apiKey);
             _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor drawing documents. " +
-                          "You can help with CAD operations, hole tables, dimension arrangements, and general Inventor questions. " +
-                          "Keep your responses concise and practical.";
+                            "You can help with CAD operations, hole tables, dimension arrangements, and general Inventor questions. " +
+                            "You should not answer questions that have nothing to do with Inventor or Engineer drawing operations. In those cases, respond with 'Sorry, that is out of my knowledge domain. Please ask me anything about Inventor'. " +
+                            "Keep your responses concise and practical.";
         }
 
         public async Task<string> SendMessageAsync(string userMessage)
