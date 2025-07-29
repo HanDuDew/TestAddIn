@@ -17,6 +17,7 @@ namespace InvAddIn.Forms
         private System.Windows.Forms.Button clearButton;
         private Label statusLabel;
         private AIChatService _aiChatService;
+        private PictureBox statusIcon;
         private List<string> _chatHistory;
 
         public ChatWindow()
@@ -33,6 +34,8 @@ namespace InvAddIn.Forms
             this.sendButton = new System.Windows.Forms.Button();
             this.clearButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
+            this.statusIcon = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.statusIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // chatDisplayTextBox
@@ -47,20 +50,23 @@ namespace InvAddIn.Forms
             this.chatDisplayTextBox.Name = "chatDisplayTextBox";
             this.chatDisplayTextBox.ReadOnly = true;
             this.chatDisplayTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.chatDisplayTextBox.Size = new System.Drawing.Size(644, 403);
+            this.chatDisplayTextBox.Size = new System.Drawing.Size(644, 520);
             this.chatDisplayTextBox.TabIndex = 0;
             this.chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about your Inventor project!\r\n\r\n";
             this.chatDisplayTextBox.TextChanged += new System.EventHandler(this.chatDisplayTextBox_TextChanged);
             // 
             // chatInputTextBox
             // 
+            this.chatInputTextBox.AcceptsReturn = true;
+            this.chatInputTextBox.AcceptsTab = true;
             this.chatInputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chatInputTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chatInputTextBox.Location = new System.Drawing.Point(10, 443);
+            this.chatInputTextBox.Location = new System.Drawing.Point(10, 558);
             this.chatInputTextBox.Multiline = true;
             this.chatInputTextBox.Name = "chatInputTextBox";
-            this.chatInputTextBox.Size = new System.Drawing.Size(524, 40);
+            this.chatInputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.chatInputTextBox.Size = new System.Drawing.Size(524, 101);
             this.chatInputTextBox.TabIndex = 1;
             this.chatInputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChatInputTextBox_KeyDown);
             // 
@@ -71,7 +77,7 @@ namespace InvAddIn.Forms
             this.sendButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.sendButton.ForeColor = System.Drawing.Color.Black;
-            this.sendButton.Location = new System.Drawing.Point(548, 443);
+            this.sendButton.Location = new System.Drawing.Point(548, 558);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(106, 40);
             this.sendButton.TabIndex = 2;
@@ -86,7 +92,7 @@ namespace InvAddIn.Forms
             this.clearButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.clearButton.ForeColor = System.Drawing.Color.Black;
-            this.clearButton.Location = new System.Drawing.Point(548, 494);
+            this.clearButton.Location = new System.Drawing.Point(548, 619);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(106, 40);
             this.clearButton.TabIndex = 3;
@@ -100,22 +106,34 @@ namespace InvAddIn.Forms
             this.statusLabel.AutoSize = true;
             this.statusLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusLabel.ForeColor = System.Drawing.Color.Gray;
-            this.statusLabel.Location = new System.Drawing.Point(5, 499);
+            this.statusLabel.Location = new System.Drawing.Point(45, 662);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(72, 30);
             this.statusLabel.TabIndex = 4;
             this.statusLabel.Text = "Ready";
             // 
+            // statusIcon
+            // 
+            this.statusIcon.Location = new System.Drawing.Point(10, 665);
+            this.statusIcon.Name = "statusIcon";
+            this.statusIcon.Size = new System.Drawing.Size(27, 27);
+            this.statusIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.statusIcon.TabIndex = 5;
+            this.statusIcon.TabStop = false;
+            this.statusIcon.Image = null;
+            // 
             // ChatWindow
             // 
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.Controls.Add(this.statusIcon);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.clearButton);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.chatInputTextBox);
             this.Controls.Add(this.chatDisplayTextBox);
             this.Name = "ChatWindow";
-            this.Size = new System.Drawing.Size(664, 543);
+            this.Size = new System.Drawing.Size(664, 703);
+            ((System.ComponentModel.ISupportInitialize)(this.statusIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -133,12 +151,14 @@ namespace InvAddIn.Forms
                     _aiChatService = new AIChatService(savedApiKey);
                     statusLabel.Text = "AI Ready";
                     statusLabel.ForeColor = Color.Green;
+                    SetStatusIcon("ready");
                     AppendToChatDisplay("AI service connected using saved API key!\r\n\r\n");
                 }
                 catch (Exception ex)
                 {
                     statusLabel.Text = "AI Unavailable";
                     statusLabel.ForeColor = Color.Red;
+                    SetStatusIcon("error");
                     AppendToChatDisplay($"Error initializing AI service with saved key: {ex.Message}\r\n\r\n");
                 }
             }
@@ -146,6 +166,7 @@ namespace InvAddIn.Forms
             {
                 statusLabel.Text = "API Key Required";
                 statusLabel.ForeColor = Color.Orange;
+                SetStatusIcon("warning");
                 AppendToChatDisplay("Please configure your OpenAI API key via Settings ¡ú Configure API Key.\r\n\r\n");
             }
         }
@@ -157,6 +178,7 @@ namespace InvAddIn.Forms
                 _aiChatService = new AIChatService(apiKey);
                 statusLabel.Text = "AI Ready";
                 statusLabel.ForeColor = Color.Green;
+                SetStatusIcon("ready");
                 AppendToChatDisplay("AI service connected successfully!\r\n");
                 
                 // Save the API key for future use
@@ -166,7 +188,47 @@ namespace InvAddIn.Forms
             {
                 statusLabel.Text = "AI Unavailable";
                 statusLabel.ForeColor = Color.Red;
+                SetStatusIcon("error");
                 AppendToChatDisplay($"Error connecting to AI service: {ex.Message}\r\n");
+            }
+        }
+
+        private void SetStatusIcon(string status)
+        {
+            try
+            {
+                switch (status.ToLower())
+                {
+                    case "ready":
+                    case "success":
+                        statusIcon.Image = InvAddIn.Properties.Resources.check;
+                        break;
+                    case "thinking":
+                    case "processing":
+                        statusIcon.Image = InvAddIn.Properties.Resources.brain;
+                        break;
+                    case "error":
+                    case "failed":
+                        statusIcon.Image = InvAddIn.Properties.Resources.circle;
+                        break;
+                    case "warning":
+                    case "caution":
+                        statusIcon.Image = InvAddIn.Properties.Resources.warning_sign;
+                        break;
+                    default:
+                        statusIcon.Image = null;
+                        break;
+                }
+                
+                // Force the PictureBox to refresh
+                statusIcon.Invalidate();
+                statusIcon.Update();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error setting status icon ({status}): {ex.Message}");
+                // Fallback: clear the icon if there's an error
+                statusIcon.Image = null;
             }
         }
 
@@ -202,8 +264,9 @@ namespace InvAddIn.Forms
             _chatHistory.Add($"User: {userMessage}");
 
             // Show thinking status
-            statusLabel.Text = "AI is thinking...";
+            statusLabel.Text = "Thinking...";
             statusLabel.ForeColor = Color.Orange;
+            SetStatusIcon("thinking");
             sendButton.Enabled = false;
 
             try
@@ -216,12 +279,14 @@ namespace InvAddIn.Forms
 
                 statusLabel.Text = "Ready";
                 statusLabel.ForeColor = Color.Green;
+                SetStatusIcon("ready");
             }
             catch (Exception ex)
             {
                 AppendToChatDisplay($"Error: {ex.Message}\r\n\r\n");
                 statusLabel.Text = "Error occurred";
                 statusLabel.ForeColor = Color.Red;
+                SetStatusIcon("error");
             }
             finally
             {
@@ -237,6 +302,7 @@ namespace InvAddIn.Forms
             chatDisplayTextBox.Text = "AI Chat Assistant - Ask me anything about your Inventor project!\r\n\r\n";
             statusLabel.Text = "Ready";
             statusLabel.ForeColor = Color.Green;
+            SetStatusIcon("ready");
         }
 
         private void AppendToChatDisplay(string text)

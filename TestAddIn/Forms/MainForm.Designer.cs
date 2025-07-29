@@ -106,9 +106,6 @@ namespace InvAddIn.Forms
             // 
             this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.settingsToolStripMenuItem,
-            this.aboutToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(970, 39);
@@ -126,7 +123,7 @@ namespace InvAddIn.Forms
             // configureAPIKeyToolStripMenuItem
             // 
             this.configureAPIKeyToolStripMenuItem.Name = "configureAPIKeyToolStripMenuItem";
-            this.configureAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
+            this.configureAPIKeyToolStripMenuItem.Size = new System.Drawing.Size(355, 44);
             this.configureAPIKeyToolStripMenuItem.Text = "Configure API Key";
             this.configureAPIKeyToolStripMenuItem.Click += new System.EventHandler(this.configureAPIKeyToolStripMenuItem_Click);
             // 
@@ -140,19 +137,21 @@ namespace InvAddIn.Forms
             // pictureBox1
             // 
             this.pictureBox1.Image = global::InvAddIn.Properties.Resources.logo;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 89);
+            this.pictureBox1.Location = new System.Drawing.Point(22, 59);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(389, 59);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
             // 
             // chatWindow
             // 
             this.chatWindow.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.chatWindow.Location = new System.Drawing.Point(407, 60);
+            this.chatWindow.Location = new System.Drawing.Point(417, 59);
             this.chatWindow.Name = "chatWindow";
-            this.chatWindow.Size = new System.Drawing.Size(532, 540);
+            this.chatWindow.Size = new System.Drawing.Size(541, 590);
             this.chatWindow.TabIndex = 6;
+            this.chatWindow.Load += new System.EventHandler(this.chatWindow_Load);
             // 
             // MainForm
             // 

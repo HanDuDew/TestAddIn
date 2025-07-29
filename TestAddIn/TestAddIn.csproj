@@ -214,13 +214,22 @@
     <None Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\favicon16.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\favicon16.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\favicon32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\brain.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\warning-sign.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\circle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\check.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -19,6 +19,7 @@ namespace InvAddIn.Forms
         public MainForm()
         {
             InitializeComponent();
+            // Menu items are now properly configured in the designer
         }
 
         /// <summary>
@@ -118,10 +119,10 @@ namespace InvAddIn.Forms
                                   "This add-in helps you create hole tables, arrange dimensions, " +
                                   "and provides AI assistance for your Inventor project.\n\n" +
                                   "Features:\n" +
-                                  "+ Hole Table Generation\n" +
-                                  "+ Auto Dimension Arrangement\n" +
-                                  "+ AI Chat Assistant\n" +
-                                  "- Centermarks (Coming Soon)\n\n" +
+                                  "? Hole Table Generation\n" +
+                                  "? Auto Dimension Arrangement\n" +
+                                  "? AI Chat Assistant\n" +
+                                  "? Centermarks (Coming Soon)\n\n" +
                                   "For support, please configure your OpenAI API key in Settings.";
 
             MessageBox.Show(aboutMessage, "About Test AddIn", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -156,6 +157,11 @@ namespace InvAddIn.Forms
         }
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chatWindow_Load(object sender, EventArgs e)
         {
 
         }
