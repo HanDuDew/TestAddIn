@@ -180,6 +180,7 @@
     <Compile Include="StandardAddInServer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utils\CommonUtils.cs" />
     <Compile Include="Utils\PictureDispConverter.cs" />
   </ItemGroup>
   <ItemGroup>

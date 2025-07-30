@@ -6,6 +6,7 @@ namespace InvAddIn.Common
 {
     public static class ConfigurationHelper
     {
+        // change this path during deployment !!!
         private static readonly string ConfigFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "TestAddIn",
