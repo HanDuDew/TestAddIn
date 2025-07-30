@@ -47,7 +47,7 @@ namespace InvAddIn.Core
                         global::Inventor.CommandTypesEnum.kShapeEditCmdType, // CommandType
                         System.Guid.NewGuid().ToString(), // ClientId
                         "Opens the Test Add In Main Form", // ToolTipText
-                        "Opens the Test AddIn Main Form for hole table operations", // DescriptionText
+                        "Opens the Test AddIn Main Form for drawing doc operations or chat with AI", // DescriptionText
                         standardIcon, // StandardIcon (16x16)
                         largeIcon, // LargeIcon (32x32)
                         global::Inventor.ButtonDisplayEnum.kDisplayTextInLearningMode // ButtonDisplay
