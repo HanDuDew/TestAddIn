@@ -16,6 +16,7 @@ namespace InvAddIn.Core
     {
         private global::Inventor.Application m_inventorApplication;
         private global::Inventor.ButtonDefinition m_buttonDefinition;
+        private MainForm m_mainForm; // Keep reference to prevent multiple instances
 
         public InventorButton(global::Inventor.Application inventorApp)
         {
@@ -262,10 +263,32 @@ namespace InvAddIn.Core
         {
             try
             {
-                // Launch the MainForm when button is clicked
-                MainForm mainForm = new MainForm();
-                mainForm.SetInventorApplication(m_inventorApplication);
-                mainForm.ShowDialog();
+                // Check if form is already open
+                if (m_mainForm != null && !m_mainForm.IsDisposed)
+                {
+                    // Form is already open, bring it to front
+                    if (m_mainForm.WindowState == FormWindowState.Minimized)
+                    {
+                        m_mainForm.WindowState = FormWindowState.Normal;
+                    }
+                    m_mainForm.BringToFront();
+                    m_mainForm.Activate();
+                }
+                else
+                {
+                    // Create and show new form as modeless (non-blocking)
+                    m_mainForm = new MainForm();
+                    m_mainForm.SetInventorApplication(m_inventorApplication);
+                    
+                    // Handle form closing to clean up reference
+                    m_mainForm.FormClosed += (sender, e) => { m_mainForm = null; };
+                    
+                    // Show as modeless dialog (non-blocking)
+                    m_mainForm.Show();
+                    
+                    // Bring to front after showing
+                    m_mainForm.BringToFront();
+                }
             }
             catch (Exception ex)
             {
@@ -277,6 +300,13 @@ namespace InvAddIn.Core
         {
             try
             {
+                // Close the main form if it's open
+                if (m_mainForm != null && !m_mainForm.IsDisposed)
+                {
+                    m_mainForm.Close();
+                    m_mainForm = null;
+                }
+
                 if (m_buttonDefinition != null)
                 {
                     m_buttonDefinition.OnExecute -= OnButtonExecute;
