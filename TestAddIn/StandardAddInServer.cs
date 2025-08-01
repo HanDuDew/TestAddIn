@@ -3,9 +3,9 @@ using System;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Reflection;
-using InvAddIn.Core;
+using AutoBeau.Core;
 
-namespace TestAddIn
+namespace AutoBeau
 {
     /// <summary>
     /// This is the primary AddIn Server class that implements the ApplicationAddInServer interface
@@ -20,7 +20,7 @@ namespace TestAddIn
         private global::Inventor.Application m_inventorApplication;
         
         // Button instance for our custom ribbon button
-        private InvAddIn.Core.InventorButton m_customButton;
+        private AutoBeau.Core.InventorButton m_customButton;
 
         public StandardAddInServer()
         {
@@ -42,11 +42,14 @@ namespace TestAddIn
                 // Initialize AddIn members.
                 m_inventorApplication = addInSiteObject.Application;
                 
-                // Initialize and create the custom button
-                m_customButton = new InvAddIn.Core.InventorButton(m_inventorApplication);
+                // Initialize and create the custom button and dockable window
+                m_customButton = new AutoBeau.Core.InventorButton(m_inventorApplication);
                 m_customButton.Initialize();
-                
-                MessageBox.Show("Test AddIn loaded successfully! Look for the 'Open Test AddIn' button in the ribbon.", "AddIn Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // (Optional) Show a success message
+                //MessageBox.Show("AddIn loaded successfully!\n\n" +
+                //               "Look for the 'Open AutoBeau' button in the ribbon to open.", 
+                //               "AutoBeau Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -110,7 +113,7 @@ namespace TestAddIn
                 // Remove the assembly resolve handler
                 AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
                 
-                // Clean up the custom button
+                // Clean up the custom button and dockable window
                 if (m_customButton != null)
                 {
                     m_customButton.Cleanup();
@@ -119,7 +122,7 @@ namespace TestAddIn
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error during button cleanup: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error during cleanup: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             // Release objects.

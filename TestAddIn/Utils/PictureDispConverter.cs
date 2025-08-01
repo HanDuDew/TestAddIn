@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace InvAddIn.Utils
+namespace AutoBeau.Utils
 {
     /// <summary>
     /// Utility class for converting System.Drawing.Bitmap objects to COM IPictureDisp objects

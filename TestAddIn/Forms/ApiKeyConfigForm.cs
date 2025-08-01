@@ -1,10 +1,10 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using InvAddIn.Services;
-using InvAddIn.Common;
+using AutoBeau.Services;
+using AutoBeau.Common;
 
-namespace InvAddIn.Forms
+namespace AutoBeau.Forms
 {
     public partial class ApiKeyConfigForm : Form
     {

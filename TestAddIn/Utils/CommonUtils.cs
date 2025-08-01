@@ -6,7 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InvAddIn.Utils
+namespace AutoBeau.Utils
 {
     public class CommonUtils
     {

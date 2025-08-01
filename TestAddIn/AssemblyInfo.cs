@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("TestAddIn")]
-[assembly: AssemblyDescription("TestAddIn")]
+[assembly: AssemblyTitle("AutoBeau")]
+[assembly: AssemblyDescription("AutoBeau - Inventor Add-in for AI-assisted drawing operations")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Autodesk, Inc.")]
-[assembly: AssemblyProduct("Autodesk Inventor")]
-[assembly: AssemblyCopyright("Copyright ?2012 Autodesk, Inc.")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("AutoBeau for Autodesk Inventor")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
 
-namespace InvAddIn.Services
+namespace AutoBeau.Services
 {
     public class AIChatService
     {
@@ -15,9 +15,10 @@ namespace InvAddIn.Services
         public AIChatService(string apiKey)
         {
             _openAIClient = new OpenAIClient(apiKey);
-            _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor drawing documents. " +
-                            "You can help with CAD operations, hole tables, dimension arrangements, and general Inventor questions. " +
+            _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor projects and general questions." +
+                            "Your primary focus is to assist users with drawing operations in Inventor." +
                             "You should not answer questions that have nothing to do with Inventor or Engineer drawing operations. In those cases, respond with 'Sorry, that is out of my knowledge domain. Please ask me anything about Inventor'. " +
+                            "Greetings are allowed." +
                             "Keep your responses concise and practical.";
         }
 
@@ -66,7 +67,8 @@ namespace InvAddIn.Services
 
                 messages.Add(new UserChatMessage(userMessage));
 
-                var chatCompletion = await _openAIClient.GetChatClient("gpt-3.5-turbo").CompleteChatAsync(messages);
+                // Uses gpt-4o-mini for testing purposes
+                var chatCompletion = await _openAIClient.GetChatClient("gpt-4o-mini").CompleteChatAsync(messages);
                 
                 return chatCompletion.Value.Content[0].Text;
             }

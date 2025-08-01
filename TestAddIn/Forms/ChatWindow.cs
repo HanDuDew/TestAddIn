@@ -4,10 +4,10 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using InvAddIn.Services;
-using InvAddIn.Common;
+using AutoBeau.Services;
+using AutoBeau.Common;
 
-namespace InvAddIn.Forms
+namespace AutoBeau.Forms
 {
     public partial class ChatWindow : UserControl
     {
@@ -66,37 +66,45 @@ namespace InvAddIn.Forms
             this.chatInputTextBox.Multiline = true;
             this.chatInputTextBox.Name = "chatInputTextBox";
             this.chatInputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.chatInputTextBox.Size = new System.Drawing.Size(524, 101);
+            this.chatInputTextBox.Size = new System.Drawing.Size(644, 86);
             this.chatInputTextBox.TabIndex = 1;
             this.chatInputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ChatInputTextBox_KeyDown);
             // 
             // sendButton
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.sendButton.BackColor = System.Drawing.Color.White;
+            this.sendButton.BackColor = System.Drawing.Color.Transparent;
+            this.sendButton.BackgroundImage = global::AutoBeau.Properties.Resources.send;
+            this.sendButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.sendButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.sendButton.FlatAppearance.BorderColor = System.Drawing.SystemColors.Menu;
+            this.sendButton.FlatAppearance.BorderSize = 0;
             this.sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.sendButton.ForeColor = System.Drawing.Color.Black;
-            this.sendButton.Location = new System.Drawing.Point(548, 558);
+            this.sendButton.Location = new System.Drawing.Point(553, 654);
             this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(106, 40);
+            this.sendButton.Size = new System.Drawing.Size(85, 37);
             this.sendButton.TabIndex = 2;
-            this.sendButton.Text = "Send";
+            this.sendButton.Text = "\r\n";
             this.sendButton.UseVisualStyleBackColor = false;
+            this.sendButton.Visible = false;
             this.sendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
             // clearButton
             // 
             this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.clearButton.BackColor = System.Drawing.Color.White;
+            this.clearButton.BackColor = System.Drawing.Color.Transparent;
+            this.clearButton.BackgroundImage = global::AutoBeau.Properties.Resources.broom;
+            this.clearButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.clearButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.clearButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.clearButton.FlatAppearance.BorderSize = 0;
             this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.clearButton.ForeColor = System.Drawing.Color.Black;
-            this.clearButton.Location = new System.Drawing.Point(548, 619);
+            this.clearButton.Location = new System.Drawing.Point(457, 652);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(106, 40);
             this.clearButton.TabIndex = 3;
-            this.clearButton.Text = "Clear";
             this.clearButton.UseVisualStyleBackColor = false;
             this.clearButton.Click += new System.EventHandler(this.ClearButton_Click);
             // 
@@ -114,13 +122,14 @@ namespace InvAddIn.Forms
             // 
             // statusIcon
             // 
-            this.statusIcon.Location = new System.Drawing.Point(10, 665);
+            this.statusIcon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.statusIcon.Location = new System.Drawing.Point(10, 662);
             this.statusIcon.Name = "statusIcon";
             this.statusIcon.Size = new System.Drawing.Size(27, 27);
             this.statusIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.statusIcon.TabIndex = 5;
             this.statusIcon.TabStop = false;
-            this.statusIcon.Image = null;
+            this.statusIcon.Click += new System.EventHandler(this.statusIcon_Click);
             // 
             // ChatWindow
             // 
@@ -152,7 +161,7 @@ namespace InvAddIn.Forms
                     statusLabel.Text = "AI Ready";
                     statusLabel.ForeColor = Color.Green;
                     SetStatusIcon("ready");
-                    AppendToChatDisplay("AI service connected using saved API key!\r\n\r\n");
+                    //AppendToChatDisplay("AI service connected using saved API key!\r\n\r\n");
                 }
                 catch (Exception ex)
                 {
@@ -201,19 +210,19 @@ namespace InvAddIn.Forms
                 {
                     case "ready":
                     case "success":
-                        statusIcon.Image = InvAddIn.Properties.Resources.check;
+                        statusIcon.Image = AutoBeau.Properties.Resources.check;
                         break;
                     case "thinking":
                     case "processing":
-                        statusIcon.Image = InvAddIn.Properties.Resources.brain;
+                        statusIcon.Image = AutoBeau.Properties.Resources.brain;
                         break;
                     case "error":
                     case "failed":
-                        statusIcon.Image = InvAddIn.Properties.Resources.circle;
+                        statusIcon.Image = AutoBeau.Properties.Resources.circle;
                         break;
                     case "warning":
                     case "caution":
-                        statusIcon.Image = InvAddIn.Properties.Resources.warning_sign;
+                        statusIcon.Image = AutoBeau.Properties.Resources.warning_sign;
                         break;
                     default:
                         statusIcon.Image = null;
@@ -318,6 +327,11 @@ namespace InvAddIn.Forms
         }
 
         private void chatDisplayTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void statusIcon_Click(object sender, EventArgs e)
         {
 
         }

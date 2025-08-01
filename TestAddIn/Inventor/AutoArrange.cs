@@ -4,15 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InvAddIn.Inventor
+namespace AutoBeau.Inventor
 {
-    internal class AutoArrange
+    internal class AutoArrange : InventorMethodBase
     {
         /// <summary>
-        /// Arranges all general dimensions automatically in the active drawing document
+        /// Display name for this method
+        /// </summary>
+        public override string DisplayName => "Auto Arrange";
+
+        /// <summary>
+        /// Arranges all general dimensions automatically using the provided drawing view
         /// </summary>
         /// <param name="inventorApp">The Inventor Application object</param>
-        public void ArrangeAllGeneralDimensions(global::Inventor.Application inventorApp)
+        /// <param name="drawingView">The drawing view to work with</param>
+        public void ArrangeAllGeneralDimensions(global::Inventor.Application inventorApp, global::Inventor.DrawingView drawingView)
         {
             try
             {
@@ -22,16 +28,16 @@ namespace InvAddIn.Inventor
                     throw new InvalidOperationException("Please open a drawing document.");
                 }
 
+                if (drawingView == null)
+                {
+                    throw new InvalidOperationException("Drawing view cannot be null.");
+                }
+
                 global::Inventor.DrawingDocument oDrawDoc = (global::Inventor.DrawingDocument)inventorApp.ActiveDocument;
                 global::Inventor.Sheet oSheet = oDrawDoc.ActiveSheet;
 
-                // Check if a drawing view is selected
-                if (oDrawDoc.SelectSet.Count == 0)
-                {
-                    throw new InvalidOperationException("No drawing view is selected. Please select a drawing view first.");
-                }
-
-                global::Inventor.DrawingView oDrawingView = (global::Inventor.DrawingView)oDrawDoc.SelectSet[1];
+                // Use the provided drawing view instead of getting from selection
+                global::Inventor.DrawingView oDrawingView = drawingView;
 
                 // Create a collection to hold dimensions to arrange
                 global::Inventor.ObjectCollection oDimsToArrange = inventorApp.TransientObjects.CreateObjectCollection();
@@ -112,13 +118,57 @@ namespace InvAddIn.Inventor
         }
 
         /// <summary>
+        /// Legacy method for backward compatibility - uses selection set
+        /// </summary>
+        /// <param name="inventorApp">The Inventor Application object</param>
+        public void ArrangeAllGeneralDimensionsLegacy(global::Inventor.Application inventorApp)
+        {
+            try
+            {
+                // Make sure we are in a drawing document
+                if (inventorApp.ActiveDocument.DocumentType != global::Inventor.DocumentTypeEnum.kDrawingDocumentObject)
+                {
+                    throw new InvalidOperationException("Please open a drawing document.");
+                }
+
+                global::Inventor.DrawingDocument oDrawDoc = (global::Inventor.DrawingDocument)inventorApp.ActiveDocument;
+
+                // Check if a drawing view is selected
+                if (oDrawDoc.SelectSet.Count == 0)
+                {
+                    throw new InvalidOperationException("No drawing view is selected. Please select a drawing view first.");
+                }
+
+                global::Inventor.DrawingView oDrawingView = (global::Inventor.DrawingView)oDrawDoc.SelectSet[1];
+
+                // Call the new method with the selected view
+                ArrangeAllGeneralDimensions(inventorApp, oDrawingView);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in auto arrange functionality: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Static method to arrange all general dimensions
         /// </summary>
         /// <param name="inventorApp">The Inventor Application object</param>
         public static void ArrangeAllGeneralDimensionsStatic(global::Inventor.Application inventorApp)
         {
             AutoArrange autoArrange = new AutoArrange();
-            autoArrange.ArrangeAllGeneralDimensions(inventorApp);
+            autoArrange.ArrangeAllGeneralDimensionsLegacy(inventorApp);
+        }
+
+        /// <summary>
+        /// Implementation of the abstract Execute method from InventorMethodBase
+        /// This provides a consistent interface for the QueuedInventorMethodsHelper
+        /// </summary>
+        /// <param name="inventorApp">The Inventor Application object</param>
+        /// <param name="drawingView">The selected drawing view to operate on</param>
+        public override void Execute(global::Inventor.Application inventorApp, global::Inventor.DrawingView drawingView)
+        {
+            ArrangeAllGeneralDimensions(inventorApp, drawingView);
         }
     }
 }

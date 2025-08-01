@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <assemblyIdentity name="AutoBeau" version="1.0.0.0"></assemblyIdentity>
+
+  <clrClass clsid="{146b656f-a63b-4e92-8749-5b1470fd6c34}" progid="AutoBeau.StandardAddInServer" threadingModel="Both" name="AutoBeau.StandardAddInServer" runtimeVersion=""></clrClass>
+
+  <file name="AutoBeau.dll" hashalg="SHA1"></file>
+
+</assembly>

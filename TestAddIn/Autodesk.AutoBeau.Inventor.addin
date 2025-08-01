@@ -1,0 +1,14 @@
+<Addin Type="Standard">
+  <!--Created for Autodesk Inventor Version 27.0-->
+  <ClassId>{146b656f-a63b-4e92-8749-5b1470fd6c34}</ClassId>
+  <ClientId>{146b656f-a63b-4e92-8749-5b1470fd6c34}</ClientId>
+  <DisplayName>AutoBeau</DisplayName>
+  <Description>AutoBeau - AI-assisted drawing operations and beautification for Autodesk Inventor</Description>
+  <Assembly>TestAddIn\AutoBeau.dll</Assembly>
+  <LoadOnStartUp>1</LoadOnStartUp>
+  <UserUnloadable>1</UserUnloadable>
+  <Hidden>0</Hidden>
+  <SupportedSoftwareVersionGreaterThan>26..</SupportedSoftwareVersionGreaterThan>
+  <DataVersion>1</DataVersion>
+  <UserInterfaceVersion>1</UserInterfaceVersion>
+</Addin>

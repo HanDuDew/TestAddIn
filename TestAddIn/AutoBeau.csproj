@@ -18,7 +18,7 @@
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
-    <RootNamespace>InvAddIn</RootNamespace>
+    <RootNamespace>AutoBeau</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <StartupObject>
     </StartupObject>
@@ -78,6 +78,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>AutoBeau</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="autodesk.inventor.interop, Version=27.0.0.0, Culture=neutral, PublicKeyToken=d84147f8b4276564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -117,6 +120,7 @@
     <Reference Include="System.ClientModel, Version=1.5.1.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ClientModel.1.5.1\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
@@ -148,11 +152,17 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ConfigurationHelper.cs" />
+    <Compile Include="Common\QueuedInventorMethodsHelper.cs" />
+    <Compile Include="Core\AutoBeauDockableWindow.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\DockableWindowManager.cs" />
     <Compile Include="Core\InventorButton.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -163,20 +173,24 @@
     <Compile Include="Forms\ChatWindow.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\MainForm.cs">
+    <Compile Include="Forms\ChooseInventorMethodsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <Compile Include="Forms\ChooseInventorMethodsForm.Designer.cs">
+      <DependentUpon>ChooseInventorMethodsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Inventor\AutoAddCenterlinesAndCentermarks.cs" />
     <Compile Include="Inventor\AutoArrange.cs" />
     <Compile Include="Inventor\CreateHoleTable.cs" />
+    <Compile Include="Inventor\DrawingRetrieveDims.cs" />
+    <Compile Include="Inventor\IInventorMethod.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\AIChatService.cs" />
+    <Compile Include="Services\InventorContextService.cs" />
     <Compile Include="StandardAddInServer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -185,23 +199,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Autodesk.TestAddIn.Inventor.addin" />
     <None Include="packages.config" />
+    <None Include="AutoBeau.X.manifest" />
     <None Include="TestAddIn.X.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Autodesk.TestAddIn.Inventor.addin" />
+    <None Include="Autodesk.AutoBeau.Inventor.addin" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Core\AutoBeauDockableWindow.resx">
+      <DependentUpon>AutoBeauDockableWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ChatWindow.resx">
       <DependentUpon>ChatWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="Forms\ChooseInventorMethodsForm.resx">
+      <DependentUpon>ChooseInventorMethodsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -233,15 +251,21 @@
   <ItemGroup>
     <None Include="Resources\check.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\broom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\send.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>WHERE MT.EXE
 IF ERRORLEVEL 1 call "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat" amd64
-        mt.exe -manifest "$(ProjectDir)TestAddIn.X.manifest" -outputresource:"$(TargetPath)";#2
+        mt.exe -manifest "$(ProjectDir)AutoBeau.X.manifest" -outputresource:"$(TargetPath)";#2
 			XCopy "$(TargetPath)" "%AppData%\Autodesk\ApplicationPlugins\$(TargetName)\" /Y /R
-		    XCopy "$(ProjectDir)Autodesk.TestAddIn.Inventor.addin" "%AppData%\Autodesk\ApplicationPlugins\$(TargetName)\" /Y /R   
+		    XCopy "$(ProjectDir)Autodesk.AutoBeau.Inventor.addin" "%AppData%\Autodesk\ApplicationPlugins\$(TargetName)\" /Y /R   
 	</PostBuildEvent>
   </PropertyGroup>
 </Project>

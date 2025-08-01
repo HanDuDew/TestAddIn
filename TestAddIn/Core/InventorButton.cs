@@ -7,20 +7,22 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using InvAddIn.Forms;
-using InvAddIn.Utils;
+using AutoBeau.Forms;
+using AutoBeau.Utils;
 
-namespace InvAddIn.Core
+namespace AutoBeau.Core
 {
     internal class InventorButton
     {
         private global::Inventor.Application m_inventorApplication;
         private global::Inventor.ButtonDefinition m_buttonDefinition;
-        private MainForm m_mainForm; // Keep reference to prevent multiple instances
+        private DockableWindowManager m_dockableWindowManager; // Changed from MainForm to DockableWindowManager
 
         public InventorButton(global::Inventor.Application inventorApp)
         {
             m_inventorApplication = inventorApp;
+            // Initialize the dockable window manager
+            m_dockableWindowManager = new DockableWindowManager(inventorApp);
         }
 
         public void Initialize()
@@ -37,18 +39,18 @@ namespace InvAddIn.Core
                 // Check if button already exists
                 try
                 {
-                    m_buttonDefinition = (global::Inventor.ButtonDefinition)controlDefs["TestAddIn_MainFormButton"];
+                    m_buttonDefinition = (global::Inventor.ButtonDefinition)controlDefs["AutoBeau_MainFormButton"];
                 }
                 catch
                 {
                     // Button doesn't exist, create it
                     m_buttonDefinition = controlDefs.AddButtonDefinition(
-                        "Open Test AddIn", // DisplayName
-                        "TestAddIn_MainFormButton", // InternalName
+                        "Open AutoBeau", // DisplayName - Updated
+                        "AutoBeau_MainFormButton", // InternalName - Updated
                         global::Inventor.CommandTypesEnum.kShapeEditCmdType, // CommandType
                         System.Guid.NewGuid().ToString(), // ClientId
-                        "Opens the Test Add In Main Form", // ToolTipText
-                        "Opens the Test AddIn Main Form for drawing doc operations or chat with AI", // DescriptionText
+                        "Opens the AutoBeau Dockable Window", // ToolTipText - Updated
+                        "Opens the AutoBeau Dockable Window for drawing operations and AI chat assistance", // DescriptionText - Updated
                         standardIcon, // StandardIcon (16x16)
                         largeIcon, // LargeIcon (32x32)
                         global::Inventor.ButtonDisplayEnum.kDisplayTextInLearningMode // ButtonDisplay
@@ -60,6 +62,9 @@ namespace InvAddIn.Core
 
                 // Add the button to the ribbon
                 AddToRibbon();
+
+                // Initialize the dockable window
+                m_dockableWindowManager.Initialize();
             }
             catch (Exception ex)
             {
@@ -78,7 +83,7 @@ namespace InvAddIn.Core
                 
                 // Method 1: Try to load from embedded resource first
                 Assembly assembly = Assembly.GetExecutingAssembly();
-                string resourceName = $"TestAddIn.Resources.{iconFileName}";
+                string resourceName = $"AutoBeau.Resources.{iconFileName}";
                 
                 using (Stream stream = assembly.GetManifestResourceStream(resourceName))
                 {
@@ -93,7 +98,7 @@ namespace InvAddIn.Core
                 try
                 {
                     // Check if we can access the existing logo resource
-                    var resourceManager = InvAddIn.Properties.Resources.ResourceManager;
+                    var resourceManager = AutoBeau.Properties.Resources.ResourceManager;
                     if (resourceManager != null)
                     {
                         // Try to get a specific favicon resource
@@ -218,7 +223,7 @@ namespace InvAddIn.Core
                             // Try to find existing panel
                             foreach (global::Inventor.RibbonPanel panel in toolsTab.RibbonPanels)
                             {
-                                if (panel.InternalName.Contains("TestAddIn"))
+                                if (panel.InternalName.Contains("AutoBeau"))
                                 {
                                     testPanel = panel;
                                     break;
@@ -229,8 +234,8 @@ namespace InvAddIn.Core
                             if (testPanel == null)
                             {
                                 testPanel = toolsTab.RibbonPanels.Add(
-                                    "Test AddIn", // DisplayName
-                                    "TestAddIn_Panel", // InternalName
+                                    "AutoBeau", // DisplayName - Updated
+                                    "AutoBeau_Panel", // InternalName - Updated
                                     System.Guid.NewGuid().ToString() // ClientId
                                 );
                             }
@@ -239,8 +244,8 @@ namespace InvAddIn.Core
                         {
                             // Create a new panel if we can't find or create the desired one
                             testPanel = toolsTab.RibbonPanels.Add(
-                                "Test AddIn", // DisplayName
-                                "TestAddIn_Panel", // InternalName
+                                "AutoBeau", // DisplayName - Updated
+                                "AutoBeau_Panel", // InternalName - Updated
                                 System.Guid.NewGuid().ToString() // ClientId
                             );
                         }
@@ -263,36 +268,19 @@ namespace InvAddIn.Core
         {
             try
             {
-                // Check if form is already open
-                if (m_mainForm != null && !m_mainForm.IsDisposed)
+                // Toggle the dockable window visibility
+                m_dockableWindowManager.ToggleWindow();
+                
+                // Add a system message if the window is now visible
+                if (m_dockableWindowManager.IsVisible)
                 {
-                    // Form is already open, bring it to front
-                    if (m_mainForm.WindowState == FormWindowState.Minimized)
-                    {
-                        m_mainForm.WindowState = FormWindowState.Normal;
-                    }
-                    m_mainForm.BringToFront();
-                    m_mainForm.Activate();
-                }
-                else
-                {
-                    // Create and show new form as modeless (non-blocking)
-                    m_mainForm = new MainForm();
-                    m_mainForm.SetInventorApplication(m_inventorApplication);
-                    
-                    // Handle form closing to clean up reference
-                    m_mainForm.FormClosed += (sender, e) => { m_mainForm = null; };
-                    
-                    // Show as modeless dialog (non-blocking)
-                    m_mainForm.Show();
-                    
-                    // Bring to front after showing
-                    m_mainForm.BringToFront();
+                    // m_dockableWindowManager.AddSystemMessage("AutoBeau dockable window opened. Ready for operations!");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error launching main form: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Form Launch Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error toggling dockable window: {ex.Message}\n\nStack Trace: {ex.StackTrace}", 
+                    "Dockable Window Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -300,11 +288,11 @@ namespace InvAddIn.Core
         {
             try
             {
-                // Close the main form if it's open
-                if (m_mainForm != null && !m_mainForm.IsDisposed)
+                // Clean up the dockable window manager
+                if (m_dockableWindowManager != null)
                 {
-                    m_mainForm.Close();
-                    m_mainForm = null;
+                    m_dockableWindowManager.Cleanup();
+                    m_dockableWindowManager = null;
                 }
 
                 if (m_buttonDefinition != null)

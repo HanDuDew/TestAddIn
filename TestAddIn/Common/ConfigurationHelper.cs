@@ -2,14 +2,14 @@ using System;
 using System.Configuration;
 using System.IO;
 
-namespace InvAddIn.Common
+namespace AutoBeau.Common
 {
     public static class ConfigurationHelper
     {
-        // change this path during deployment !!!
+        // Updated path to use AutoBeau instead of TestAddIn
         private static readonly string ConfigFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "TestAddIn",
+            "AutoBeau",
             "config.txt");
 
         public static void SaveApiKey(string apiKey)
