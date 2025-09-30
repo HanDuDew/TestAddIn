@@ -35,10 +35,17 @@ namespace AutoBeau.Inventor
                 
                 global::Inventor.DrawingView oDrawingView = drawingView;
 
+                AutomatedCenterlineSettings settings;
+
+                drawingView.GetAutomatedCenterlineSettings(out settings);
+
+                settings.ProjectionNormalAxis = true;
+                settings.ProjectionParallelAxis = true;
+
                 // Set a reference to the output
                 ObjectsEnumerator results;
                 // Set the automated centerline settings
-                results = oDrawingView.SetAutomatedCenterlineSettings();
+                results = oDrawingView.SetAutomatedCenterlineSettings(settings);
             }
             catch (Exception ex)
             {

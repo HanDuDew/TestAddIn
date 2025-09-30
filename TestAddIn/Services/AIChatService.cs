@@ -17,8 +17,7 @@ namespace AutoBeau.Services
             _openAIClient = new OpenAIClient(apiKey);
             _systemPrompt = "You are an AI assistant specialized in helping with Autodesk Inventor projects and general questions." +
                             "Your primary focus is to assist users with drawing operations in Inventor." +
-                            "You should not answer questions that have nothing to do with Inventor or Engineer drawing operations. In those cases, respond with 'Sorry, that is out of my knowledge domain. Please ask me anything about Inventor'. " +
-                            "Greetings are allowed." +
+                            "You are provided with MCP tools that can operate inside Inventor." +
                             "Keep your responses concise and practical.";
         }
 
@@ -42,13 +41,19 @@ namespace AutoBeau.Services
             }
         }
 
-        public async Task<string> SendMessageWithContextAsync(string userMessage, string[] previousMessages)
+        public async Task<string> SendMessageWithContextAsync(string userMessage, string[] previousMessages, string contextSummary = null)
         {
             try
             {
+                var effectivePrompt = _systemPrompt;
+                if (!string.IsNullOrWhiteSpace(contextSummary))
+                {
+                    effectivePrompt += "\n\nCurrent Inventor context:\n" + contextSummary;
+                }
+
                 var messages = new List<ChatMessage>
                 {
-                    new SystemChatMessage(_systemPrompt)
+                    new SystemChatMessage(effectivePrompt)
                 };
 
                 // Add previous messages for context (last 10 messages to stay within token limits)

@@ -38,7 +38,7 @@ namespace AutoBeau.Inventor
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error occurred while retrieving dimensions: {ex.Message}");
-                throw new Exception($"Error occurred while retrieving dimensions: {ex.Message}", ex);
+                // throw new Exception($"Error occurred while retrieving dimensions: {ex.Message}", ex); // Don't throw here, just log
             }
         }
 

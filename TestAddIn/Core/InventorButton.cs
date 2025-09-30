@@ -166,96 +166,12 @@ namespace AutoBeau.Core
         {
             try
             {
-                // Get the ribbon for Drawing environment first (since we're working with hole tables)
                 global::Inventor.Ribbons ribbons = m_inventorApplication.UserInterfaceManager.Ribbons;
-                
-                global::Inventor.Ribbon ribbon = null;
-                try
+                string[] targetRibbons = { "Drawing", "Part", "Assembly" };
+
+                foreach (string ribbonName in targetRibbons)
                 {
-                    ribbon = ribbons["Drawing"]; // Try Drawing first
-                }
-                catch
-                {
-                    try
-                    {
-                        ribbon = ribbons["Part"]; // Fall back to Part
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            ribbon = ribbons["Assembly"]; // Fall back to Assembly
-                        }
-                        catch
-                        {
-                            // Use the first available ribbon
-                            if (ribbons.Count > 0)
-                            {
-                                ribbon = ribbons[1];
-                            }
-                        }
-                    }
-                }
-
-                if (ribbon != null)
-                {
-                    // Get or create the Tools tab
-                    global::Inventor.RibbonTab toolsTab = null;
-                    try
-                    {
-                        toolsTab = ribbon.RibbonTabs["id_TabTools"];
-                    }
-                    catch
-                    {
-                        // If Tools tab doesn't exist, use the first available tab
-                        if (ribbon.RibbonTabs.Count > 0)
-                        {
-                            toolsTab = ribbon.RibbonTabs[1];
-                        }
-                    }
-
-                    if (toolsTab != null)
-                    {
-                        // Create or get a panel for our button
-                        global::Inventor.RibbonPanel testPanel = null;
-                        try
-                        {
-                            // Try to find existing panel
-                            foreach (global::Inventor.RibbonPanel panel in toolsTab.RibbonPanels)
-                            {
-                                if (panel.InternalName.Contains("AutoBeau"))
-                                {
-                                    testPanel = panel;
-                                    break;
-                                }
-                            }
-
-                            // If panel doesn't exist, create it
-                            if (testPanel == null)
-                            {
-                                testPanel = toolsTab.RibbonPanels.Add(
-                                    "AutoBeau", // DisplayName - Updated
-                                    "AutoBeau_Panel", // InternalName - Updated
-                                    System.Guid.NewGuid().ToString() // ClientId
-                                );
-                            }
-                        }
-                        catch
-                        {
-                            // Create a new panel if we can't find or create the desired one
-                            testPanel = toolsTab.RibbonPanels.Add(
-                                "AutoBeau", // DisplayName - Updated
-                                "AutoBeau_Panel", // InternalName - Updated
-                                System.Guid.NewGuid().ToString() // ClientId
-                            );
-                        }
-
-                        if (testPanel != null)
-                        {
-                            // Add the button to the panel
-                            testPanel.CommandControls.AddButton(m_buttonDefinition, true);
-                        }
-                    }
+                    AddButtonToRibbon(ribbons, ribbonName);
                 }
             }
             catch (Exception ex)
@@ -263,6 +179,98 @@ namespace AutoBeau.Core
                 MessageBox.Show($"Error adding button to ribbon: {ex.Message}\n\nStack Trace: {ex.StackTrace}", "Ribbon Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void AddButtonToRibbon(global::Inventor.Ribbons ribbons, string ribbonName)
+        {
+            global::Inventor.Ribbon ribbon = null;
+            try
+            {
+                ribbon = ribbons[ribbonName];
+            }
+            catch
+            {
+                return;
+            }
+
+            if (ribbon == null)
+            {
+                return;
+            }
+
+            global::Inventor.RibbonTab toolsTab = null;
+            try
+            {
+                toolsTab = ribbon.RibbonTabs["id_TabTools"];
+            }
+            catch
+            {
+                if (ribbon.RibbonTabs.Count > 0)
+                {
+                    toolsTab = ribbon.RibbonTabs[1];
+                }
+            }
+
+            if (toolsTab == null)
+            {
+                return;
+            }
+
+            global::Inventor.RibbonPanel targetPanel = null;
+            try
+            {
+                foreach (global::Inventor.RibbonPanel panel in toolsTab.RibbonPanels)
+                {
+                    if (panel.InternalName.Contains("AutoBeau"))
+                    {
+                        targetPanel = panel;
+                        break;
+                    }
+                }
+
+                if (targetPanel == null)
+                {
+                    targetPanel = toolsTab.RibbonPanels.Add(
+                        "AutoBeau",
+                        $"AutoBeau_Panel_{ribbonName}",
+                        System.Guid.NewGuid().ToString());
+                }
+            }
+            catch
+            {
+                targetPanel = toolsTab.RibbonPanels.Add(
+                    "AutoBeau",
+                    $"AutoBeau_Panel_{ribbonName}",
+                    System.Guid.NewGuid().ToString());
+            }
+
+            if (targetPanel == null)
+            {
+                return;
+            }
+
+            try
+            {
+                bool alreadyAdded = false;
+                foreach (global::Inventor.CommandControl control in targetPanel.CommandControls)
+                {
+                    if (control.Definition == m_buttonDefinition)
+                    {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyAdded)
+                {
+                    targetPanel.CommandControls.AddButton(m_buttonDefinition, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding button to {ribbonName} ribbon: {ex.Message}");
+            }
+        }
+
 
         private void OnButtonExecute(global::Inventor.NameValueMap context)
         {

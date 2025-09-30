@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using AutoBeau.Common;
 using AutoBeau.Inventor;
 using AutoBeau.Forms;
+using AutoBeau.Services;
 using AutoBeau.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,7 @@ namespace AutoBeau.Core
         public void SetInventorApplication(global::Inventor.Application inventorApp)
         {
             m_inventorApplication = inventorApp;
+            InventorContextService.Instance.Initialize(inventorApp);
         }
 
         /// <summary>
@@ -293,6 +295,7 @@ namespace AutoBeau.Core
         private void SetMode(bool isAIMode)
         {
             _isAIMode = isAIMode;
+            InventorContextService.Instance.UpdateUIMode(isAIMode);
 
             if (isAIMode)
             {
@@ -336,20 +339,25 @@ namespace AutoBeau.Core
 
         private void AutoBeauDockableWindow_Load(object sender, EventArgs e)
         {
+            // Initialize MCP server (safe multi-call) so chat or future tooling can invoke methods
+            try
+            {
+                AutoBeau.MCP.InventorMCPServer.Instance.Initialize(m_inventorApplication, this);
+            }
+            catch (Exception mcpEx)
+            {
+                System.Diagnostics.Debug.WriteLine("MCP init error: " + mcpEx.Message);
+            }
+
             // Load saved method selections
             LoadMethodSelections();
+            SyncContextMethodSelections();
 
             // Show welcome message (only once when window loads)
             if (!_hasShownWelcome)
             {
                 _hasShownWelcome = true;
                 MessageBox.Show("Welcome to AutoBeau Dockable Window!\n\n",
-                               // "This window integrates natively with Inventor and can be docked,\n" +
-                               // "undocked, or resized as needed.\n\n" +
-                               // "Manual Mode: Use checkboxes to select operations and click Apply.\n" +
-                               // "You can customize which methods are available via Settings ¡ú Choose.\n" +
-                               // "AI Mode: Switch using the menu for interactive chat assistance.\n\n" +
-                               // "Configure your OpenAI API key in Settings for AI functionality."
                                "Welcome to AutoBeau", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
@@ -366,6 +374,9 @@ namespace AutoBeau.Core
                 {
                     chatWindow.AddSystemMessage("Your API key is configured. AI mode is ready to use!");
                 }
+
+                // Add quick MCP help message
+                chatWindow.AddSystemMessage("MCP tools ready. Try: list methods, select methods, execute method <name>.");
             }
         }
 
@@ -611,6 +622,8 @@ namespace AutoBeau.Core
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving method selections: {ex.Message}");
             }
+
+            SyncContextMethodSelections();
         }
 
         /// <summary>
@@ -634,6 +647,8 @@ namespace AutoBeau.Core
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading method selections: {ex.Message}");
             }
+
+            SyncContextMethodSelections();
         }
 
         private void chatWindow_Load(object sender, EventArgs e)
@@ -644,6 +659,27 @@ namespace AutoBeau.Core
         private void controlBox_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void SyncContextMethodSelections()
+        {
+            try
+            {
+                if (retrieveDimsCheckBox == null)
+                {
+                    return;
+                }
+
+                InventorContextService.Instance.UpdateMethodSelections(
+                    retrieveDimsCheckBox.Checked,
+                    autoArrangeCheckBox.Checked,
+                    checkBox2.Checked,
+                    checkBox3.Checked);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Context sync error: {ex.Message}");
+            }
         }
     }
 }
